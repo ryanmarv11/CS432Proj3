@@ -9,7 +9,7 @@ productURL = "https://api.tcgplayer.com/catalog/products/"
 searchURL = "https://api.tcgplayer.com/catalog/categories/1/search"
 searchManifestURL = "https://api.tcgplayer.com/catalog/categories/1/search/manifest"
 headers = {"Accept": "application/json", "Authorization": bearerToken}
-body = {"limit": 1,"offset": 0,"filters": [{"name": "SetName", "values":["10th Edition"]},{"name": "RequiredTypeCb","value": ["Creature"]} ]}
+body = {"limit": 500,"filters": [{"name": "SetName", "values":["New Phyrexia"]}, {"name": "RequiredTypeCb", "values":['Creature']}]}
 
 
 def printManifestResponse():
@@ -21,6 +21,7 @@ def printManifestResponse():
 
 def main():
 	response = requests.request("POST", searchURL, headers=headers, json=body)
-	item = response.json().get('results')
+	print(response.json())
+main()
 
-printManifestResponse()
+#""",{"name": "RequiredTypeCb","value": ["Creature"]}"""
