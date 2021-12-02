@@ -21,7 +21,34 @@ def printManifestResponse():
 
 def main():
 	response = requests.request("POST", searchURL, headers=headers, json=body)
-	print(response.json())
+	responseLoad = response.json()['results']
+	responseLoad.sort()
+	f = open('Modern/NPH.json')
+
+	data = json.load(f)
+	lister = []
+	for i in data['data']['cards']:
+		if 'modern' in i['legalities']:
+			if i['legalities']['modern'] == 'Legal' and i['types'] == ['Creature']:
+				lister.append(int(i['identifiers']['tcgplayerProductId']))
+	lister.sort()
+	#there are additional tcgplayer listings, verify that all listings from json are correct, then do the operation
+	notFound = []
+	for item in responseLoad:
+		here = False
+		for other in lister:
+			if not here and item == other:
+				here = True
+		if not here:
+			notFound.append(item)
+	
+	for item in notFound:
+		notURL = productURL + str(39564)
+		notResponse = requests.request("GET", notURL, headers=headers)
+		print(notResponse.text)
+		break
+	
+	
 main()
 
 #""",{"name": "RequiredTypeCb","value": ["Creature"]}"""
