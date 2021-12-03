@@ -302,7 +302,13 @@ def getKeywordModifier(keyWords):
 
 
 def main():
-	f = open(mode + '/' + abv + '.json') #changes every execution
+	#Overlap instructions found here!
+	"""
+	If you would like to calculate the efficiency score for a set in the Pioneer folder
+	but using the 'c' values for modern, just comment out Option 1 and uncomment Option 2
+	"""
+	f = open(mode + '/' + abv + '.json') #Option 1
+	#f = open('Modern/' + abv + '.json') #Option 2
 	data = json.load(f)
 	cardList = []
 	for item in data['data']['cards']:
@@ -358,8 +364,6 @@ def main():
 expansion = input("What is the set name?")
 mode = input("What is the mode?")
 abv = input("What is the abbreviation?")
-#mode = "Duel" #changes every execution
-#expansion = "Elves vs. Goblins" #changes every execution
 setSetDict()
 main()
 
