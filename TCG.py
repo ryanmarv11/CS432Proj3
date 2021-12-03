@@ -9,7 +9,7 @@ productURL = "https://api.tcgplayer.com/catalog/products/"
 searchURL = "https://api.tcgplayer.com/catalog/categories/1/search"
 searchManifestURL = "https://api.tcgplayer.com/catalog/categories/1/search/manifest"
 headers = {"Accept": "application/json", "Authorization": bearerToken}
-body = {"limit": 500,"filters": [{"name": "SetName", "values":["New Phyrexia"]}, {"name": "RequiredTypeCb", "values":['Creature']}]}
+body = {"sort": "ProductName ASC","limit": 500,"filters": [{"name": "SetName", "values":["New Phyrexia"]}, {"name": "RequiredTypeCb", "values":['Creature']}]}
 
 
 def printManifestResponse():
@@ -22,16 +22,26 @@ def printManifestResponse():
 def main():
 	response = requests.request("POST", searchURL, headers=headers, json=body)
 	responseLoad = response.json()['results']
+	counter = 0
+	for item in responseLoad:
+		counter += 1
+		#notURL = productURL + str(item)
+		#notResponse = requests.request("GET", notURL, headers=headers)
+		#print(notResponse.text)
+	print(counter)
+
+
 	responseLoad.sort()
 	f = open('Modern/NPH.json')
 
+	counter = 0
 	data = json.load(f)
 	lister = []
-	for i in data['data']['cards']:
-		if 'modern' in i['legalities']:
-			if i['legalities']['modern'] == 'Legal' and i['types'] == ['Creature']:
-				lister.append(int(i['identifiers']['tcgplayerProductId']))
-	lister.sort()
+	for item in responseLoad:
+		for otherItem in data['data']['cards']:
+			if item == int(otherItem['identifiers']['tcgplayerProductId']):
+				counter += 1
+	print(counter)
 	#there are additional tcgplayer listings, verify that all listings from json are correct, then do the operation
 	notFound = []
 	for item in responseLoad:
@@ -42,13 +52,8 @@ def main():
 		if not here:
 			notFound.append(item)
 	
-	for item in notFound:
-		notURL = productURL + str(39564)
-		notResponse = requests.request("GET", notURL, headers=headers)
-		print(notResponse.text)
-		break
 	
 	
-main()
+printManifestResponse()
 
 #""",{"name": "RequiredTypeCb","value": ["Creature"]}"""
