@@ -301,27 +301,38 @@ def getKeywordModifier(keyWords):
 
 
 def main():
-	f = open('Pioneer/RTR.json') #changes every execution
+	f = open(mode + '/' + abv + '.json') #changes every execution
 	data = json.load(f)
 	cardList = []
 	for item in data['data']['cards']:
 		if 'Creature' in item['types']:
-			if item['power'] != '*':
-				power = int(item['power'])
-			else:
+			if item['power'] == '*':
 				power = 2
-			if item['toughness'] != '*':
-				toughness = int(item['toughness'])
+			elif item['power']  == '2+*':
+				power = 4
+			elif item['power'] == '1+*':
+				power = 3
 			else:
+				power = int(item['power'])
+			if item['toughness'] == '*':
 				toughness = 2
-			cmc = float(item['convertedManaCost'])
-			productId = item['identifiers']['tcgplayerProductId']
-			name = item['name']
-			if 'keywords' not in item:
-				keywordModifier = 0.0
+			elif item['toughness']  == '2+*':
+				toughness = 4
+			elif item['toughness'] == '7-*':
+				toughness = 5
+			elif item['toughness'] == '1+*':
+				toughness = 3
 			else:
-				keywordModifier = getKeywordModifier(item['keywords'])
-			cardList.append(Card(name, productId, power, toughness, cmc, keywordModifier))
+				toughness = int(item['toughness'])
+			cmc = float(item['convertedManaCost'])
+			if 'tcgplayerProductId' in item['identifiers']:
+				productId = item['identifiers']['tcgplayerProductId']
+				name = item['name']
+				if 'keywords' not in item:
+					keywordModifier = 0.0
+				else:
+					keywordModifier = getKeywordModifier(item['keywords'])
+				cardList.append(Card(name, productId, power, toughness, cmc, keywordModifier))
 
 	totalEfficiencyScore = 0.0
 	counter = 0
@@ -339,9 +350,11 @@ def main():
 	
 		
 			
-
-mode = "Modern" #changes every execution
-expansion = "Return to Ravnica" #changes every execution
+expansion = input("What is the set name?")
+mode = input("What is the mode?")
+abv = input("What is the abbreviation?")
+#mode = "Duel" #changes every execution
+#expansion = "Elves vs. Goblins" #changes every execution
 setSetDict()
 main()
 
