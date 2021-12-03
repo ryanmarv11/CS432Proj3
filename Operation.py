@@ -113,6 +113,7 @@ def setSetDict():
 	setDict["Ice Age"] = 1995
 	setDict["Homelands"] = 1995
 
+	setDict["Chronicles"] = 1996
 	setDict["Mirage"] = 1996
 	setDict["Alliances"] = 1996
 
