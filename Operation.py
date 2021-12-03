@@ -10,18 +10,24 @@ setDict = {}
 
 
 class Card:
-	def __init__(self, productId, power, toughness, cmc):
+	def __init__(self, name, productId, power, toughness, cmc, keywordModifier):
+		self.name = name
 		self.productId = productId
 		self.power = power
 		self.toughness = toughness
 		self.cmc = cmc
-		print(expansion)
+		self.keywordModifier = keywordModifier
 		self.date = getDate(expansion)
 		self.skuList = []
 		self.priceList = []
 		self.avgPrice = 0.0
 		self.priceScore = 0.0
-		self.baseScore = (self.power + self.toughness) / self.cmc
+		self.efficiencyScore = 0.0
+
+		if self.cmc == 0.0:
+			self.baseScore = ((self.power + self.toughness) / .5) + self.keywordModifier
+		else:
+			self.baseScore = ((self.power + self.toughness) / self.cmc) + self.keywordModifier
 
 	def setSKUList(self):
 		skuURL = baseURL + "catalog/products/" + str(self.productId) + "/skus"
@@ -89,8 +95,16 @@ class Card:
 			self.priceScore = self.getPreModernScore()
 		else:
 			print("Error, invalid mode.")
+
+	def setEfficiencyScore(self):
+		self.efficiencyScore = self.baseScore * self.priceScore
+
+	def getEfficiencyScore(self):
+		return self.efficiencyScore
+
 	def toString(self):
-		return "productId: " + str(self.productId) + " power: " + str(self.power) + " toughness: " + str(self.toughness) + " cmc: " + str(self.cmc)
+		return self.name + ":" + str(self.efficiencyScore)
+
 
 
 
@@ -228,17 +242,66 @@ def setSetDict():
 	setDict["Modern Horizons"] = 2019
 	setDict["Modern Horizons 2"] = 2021
 
+	setDict["Elves vs. Goblins"] = 2007
+	setDict["Jace vs. Chandra"] = 2008
+	setDict["Divine vs. Demonic"] = 2009
+	setDict["Garruk vs. Lilliana"] = 2009
+	setDict["Phyrexia vs. the Coalition"] = 2010
+	setDict["Elspeth vs. Tezzeret"] = 2010
+	setDict["Knights vs. Dragons"] = 2011
+	setDict["Ajani vs. Nicol Bolas"] = 2011
+	setDict["Venser vs. Koth"] = 2012
+	setDict["Izzet vs. Golgari"] = 2012
+	setDict["Sorin vs. Tibalt"] = 2013
+	setDict["Heroes vs. Monsters"] = 2013
+	setDict["Jace vs. Vraska"] = 2014
+	setDict["Speed vs. Cunning"] = 2014
+	setDict["Elspeth vs. Kiora"] = 2015
+	setDict["Zendikar vs. Eldrazi"] = 2015
+	setDict["Blessed vs. Cursed"] = 2016
+	setDict["Nissa vs. Ob Nixilis"] = 2016
+	setDict["Mind vs. Might"] = 2017
+	setDict["Merfolk vs. Goblins"] = 2017
+	setDict["Elves vs. Inventors"] = 2018
+
 def getDate(setName):
 	return setDict[setName]
 
+def getKeywordModifier(keyWords):
+	modifier = 0.0
+	if 'Convoke' in keyWords:
+		modifier += .05
+	if 'Dash' in keyWords:
+		modifier += .08
+	if 'Deathtouch' in keyWords:
+		modifier += .12
+	if 'Flying' in keyWords:
+		modifier += .15
+	if 'Reach' in keyWords:
+		modifier += .07
+	if 'Indestructible' in keyWords:
+		modifier += .25
+	if 'Landfall' in keyWords:
+		modifier += .11
+	if 'Haste' in keyWords:
+		modifier += .1
+	if 'Vigilance' in keyWords:
+		modifier += .2
+	if 'Trample' in keyWords:
+		modifier += .13
+	if 'First strike' in keyWords:
+		modifier += .14
+	if 'Double strike' in keyWords:
+		modifier += .21
+	if 'Lifelink' in keyWords:
+		modifier += .17
+	if 'Defender' in keyWords:
+		modifier -= .5
+	return modifier
+
 
 def main():
-	b = Card(39610, 2, 2, 2)
-	b.setSKUList()
-	b.setPriceList()
-	print(mode)
-	b.setPriceScore(mode)
-	f = open('Modern/NPH.json')
+	f = open('Pioneer/RTR.json') #changes every execution
 	data = json.load(f)
 	cardList = []
 	for item in data['data']['cards']:
@@ -252,13 +315,33 @@ def main():
 			else:
 				toughness = 2
 			cmc = float(item['convertedManaCost'])
-			cardList.append(Card(2, power, toughness, cmc))
+			productId = item['identifiers']['tcgplayerProductId']
+			name = item['name']
+			if 'keywords' not in item:
+				keywordModifier = 0.0
+			else:
+				keywordModifier = getKeywordModifier(item['keywords'])
+			cardList.append(Card(name, productId, power, toughness, cmc, keywordModifier))
+
+	totalEfficiencyScore = 0.0
+	counter = 0
 	for card in cardList:
-		print(card.toString())
+		if counter == 10:
+			break
+		card.setSKUList()
+		card.setPriceList()
+		card.setPriceScore(mode)
+		card.setEfficiencyScore()
+		totalEfficiencyScore += card.getEfficiencyScore()
+		counter += 1
+	setScore = totalEfficiencyScore / counter
+	print("And the score for " + expansion + " is: " + str(setScore))
+	
+		
 			
 
-mode = "Modern"
-expansion = "New Phyrexia"
+mode = "Modern" #changes every execution
+expansion = "Return to Ravnica" #changes every execution
 setSetDict()
 main()
 
