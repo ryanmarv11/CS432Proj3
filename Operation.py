@@ -232,7 +232,7 @@ def setSetDict():
 	setDict["Zendikar Rising"] = 2020
 	setDict["Core Set 2021"] = 2020
 	setDict["Ikoria: Lair of Behemoths"] = 2020
-	setDict["Theros BeyondDeath"] = 2020
+	setDict["Theros Beyond Death"] = 2020
 
 	setDict["Innistrad: Crimson Vow"] = 2021
 	setDict["Innistrad: Midnight Hunt"] = 2021
@@ -313,6 +313,8 @@ def main():
 				power = 4
 			elif item['power'] == '1+*':
 				power = 3
+			elif item['power'] == '*+1':
+				power = 3
 			else:
 				power = int(item['power'])
 			if item['toughness'] == '*':
@@ -322,6 +324,8 @@ def main():
 			elif item['toughness'] == '7-*':
 				toughness = 5
 			elif item['toughness'] == '1+*':
+				toughness = 3
+			elif item['toughness'] == '*+1':
 				toughness = 3
 			else:
 				toughness = int(item['toughness'])
